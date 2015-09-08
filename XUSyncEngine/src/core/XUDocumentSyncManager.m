@@ -562,8 +562,9 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		}
 		
 		NSDictionary *dict = @{
-							   NSMigratePersistentStoresAutomaticallyOption : @(YES)
-						   };
+			   NSSQLitePragmasOption : @{ @"journal_mode" : @"DELETE" },
+			   NSMigratePersistentStoresAutomaticallyOption : @(YES)
+		   };
 		if (![_syncStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:persistentStoreURL options:dict error:&err]){
 			NSLog(@"%@ - failed to create persistent store URL URL %@, error %@", self, persistentStoreURL, err);
 		}
