@@ -258,11 +258,26 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 			return NO; // This is a fatal error
 		}
 		
-		XUManagedObject *obj = [(XUManagedObject *)[cl alloc] initWithEntity:entityDescription insertIntoManagedObjectContext:_managedObjectContext asResultOfSyncAction:YES];
+		XUManagedObject *obj;
+		NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:[change objectEntityName]];
+		[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"ticdsSyncID == %@", [change objectSyncID]]];
+		obj = [[_managedObjectContext executeFetchRequest:fetchRequest error:nil] firstObject];
+		if (obj != nil) {
+			NSLog(@"-[XUDocumentSyncManager _applyChangeSet:withObjectCache:andReturnError:] - object with ID %@ already exists!", [obj syncUUID]);
+			continue;
+		}
+		
+		obj = [(XUManagedObject *)[cl alloc] initWithEntity:entityDescription insertIntoManagedObjectContext:_managedObjectContext asResultOfSyncAction:YES];
 		NSDictionary *attributes = [change attributes];
 		for (NSString *key in attributes){
 			id value = attributes[key];
 			[obj setValue:value forKey:key];
+		}
+		
+		// TODO - should this be really an assertion?
+		if ([obj syncUUID] != nil){
+			[XUManagedObject noticeSyncInsertionOfObjectWithID:[obj syncUUID]];
+			objCache[[obj syncUUID]] = obj;
 		}
 	}
 	

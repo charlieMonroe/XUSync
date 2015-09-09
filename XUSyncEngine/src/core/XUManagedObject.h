@@ -19,6 +19,12 @@
  */
 @interface XUManagedObject : NSManagedObject
 
+/** Call this when processing an insertion change - this will let the managed
+ * object class know that an object with this syncUUID has been inserted, so
+ * that it doesn't create an unnecessary sync change.
+ */
++(void)noticeSyncInsertionOfObjectWithID:(nonnull NSString *)syncUUID;
+
 /** This applies the sync change. It asserts that [self syncUUID] ==
  * [syncChange objectSyncID].
  */

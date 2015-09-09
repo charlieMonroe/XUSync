@@ -70,6 +70,11 @@ static NSMutableDictionary *_relationshipValueChanges;
 		_relationshipValueChanges = [[NSMutableDictionary alloc] init];
 	});
 }
++(void)noticeSyncInsertionOfObjectWithID:(nonnull NSString *)syncUUID{
+	[_changesLock lock];
+	[_insertionChanges addObject:syncUUID];
+	[_changesLock unlock];
+}
 
 -(void)_applyAttributeSyncChange:(XUAttributeSyncChange *)syncChange{
 	[self setValue:[syncChange attributeValue] forKey:[syncChange attributeName]];
@@ -117,6 +122,10 @@ static NSMutableDictionary *_relationshipValueChanges;
 	}
 	
 	NSMutableSet *valueSet = [[self valueForKey:[syncChange relationshipName]] mutableCopy];
+	if (valueSet == nil) {
+		valueSet = [NSMutableSet set];
+	}
+	
 	[valueSet addObject:[items firstObject]];
 	[self setValue:valueSet forKey:[syncChange relationshipName]];
 	
@@ -174,6 +183,13 @@ static NSMutableDictionary *_relationshipValueChanges;
 	if (targetUUID == nil){
 		// Removing relationship - don't really care if the _relationshipValueChanges
 		// actually contains a value
+		
+		if ([self valueForKey:[syncChange relationshipName]] != nil) {
+			// It's already nil -> do not set it, since it could mark the entity
+			// as updated.
+			return;
+		}
+		
 		[self setValue:nil forKey:[syncChange relationshipName]];
 		
 		[_changesLock lock];
@@ -215,7 +231,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 	[_changesLock unlock];
 }
 
--(NSArray *)_createDeletionChanges{
+-(nonnull NSArray *)_createDeletionChanges{
 	[_changesLock lock];
 	
 	if ([_deletionChanges containsObject:[self syncUUID]]){
@@ -231,7 +247,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 	
 	return @[ deletionSyncChange ];
 }
--(NSArray *)_createInsertionChanges{
+-(nonnull NSArray *)_createInsertionChanges{
 	[_changesLock lock];
 	
 	if ([_insertionChanges containsObject:[self syncUUID]]){
@@ -247,24 +263,24 @@ static NSMutableDictionary *_relationshipValueChanges;
 	
 	return [[self _createRelationshipChanges] arrayByAddingObject:syncChange];
 }
--(NSArray *)_createRelationshipChangesForRelationship:(NSRelationshipDescription *)relationship{
+-(nonnull NSArray *)_createRelationshipChangesForRelationship:(NSRelationshipDescription *)relationship{
 	NSRelationshipDescription *inverseRelationship = [relationship inverseRelationship];
 	if ([relationship isToMany] && inverseRelationship != nil && ![inverseRelationship isToMany]){
 		// With relationships that have inverse relationships, prefer the -to-one
 		// side of the relationship
-		return nil;
+		return @[ ];
 	}
 	
 	if ([relationship isToMany] && inverseRelationship != nil && [inverseRelationship isToMany] && [[relationship name] caseInsensitiveCompare:[inverseRelationship name]] == NSOrderedDescending){
 		// Both relationships (this and the inverse) are -to-many - in order, not
 		// to sync both sides, just sync the relationship that is first alphabetically
-		return nil;
+		return @[ ];
 	}
 	
 	if (![relationship isToMany] && inverseRelationship != nil && ![inverseRelationship isToMany] && [[relationship name] caseInsensitiveCompare:[inverseRelationship name]] == NSOrderedDescending){
 		// Both relationships (this and the inverse) are -to-one - in order, not
 		// to sync both sides, just sync the relationship that is first alphabetically
-		return nil;
+		return @[ ];
 	}
 	
 	if ([relationship isToMany]){
@@ -273,7 +289,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 		return [self _createToOneRelationshipChangesForRelationship:relationship];
 	}
 }
--(NSArray *)_createRelationshipChanges{
+-(nonnull NSArray *)_createRelationshipChanges{
 	NSDictionary *objectRelationshipsByName = [[self entity] relationshipsByName];
 	NSMutableArray *changes = [NSMutableArray arrayWithCapacity:[objectRelationshipsByName count]];
 	for (NSString *relationshipName in objectRelationshipsByName) {
@@ -281,7 +297,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 	}
 	return changes;
 }
--(NSArray *)_createToManyRelationshipChangesForRelationship:(NSRelationshipDescription *)relationship {
+-(nonnull NSArray *)_createToManyRelationshipChangesForRelationship:(NSRelationshipDescription *)relationship {
 	NSString *relationshipName = [relationship name];
 	NSSet *objects = [self valueForKey:relationshipName];
 	NSSet *commitedObjects = [self committedValuesForKeys:@[ relationshipName ]][relationshipName];
@@ -373,7 +389,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 	return changes;
 	
 }
--(NSArray *)_createToOneRelationshipChangesForRelationship:(NSRelationshipDescription *)relationship {
+-(nonnull NSArray *)_createToOneRelationshipChangesForRelationship:(NSRelationshipDescription *)relationship {
 	NSString *relationshipName = [relationship name];
 	XUManagedObject *value = [self valueForKey:relationshipName];
 	if (value != nil && ![value isKindOfClass:[XUManagedObject class]]){
@@ -415,7 +431,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 	NSLog(@"Creating to-one relationship change on [%@ %@]{%@} -> %@{%@}", [self class], relationshipName, [self syncUUID], [value class], [value syncUUID]);
 	return @[ syncChange ];
 }
--(NSArray *)_createUpdateChanges{
+-(nonnull NSArray *)_createUpdateChanges{
 	NSDictionary *changedValues = [self changedValues];
 	NSMutableArray *changes = [NSMutableArray arrayWithCapacity:[changedValues count]];
 	for (NSString *propertyName in changedValues) {
