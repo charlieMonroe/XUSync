@@ -26,6 +26,13 @@ static inline void _XULogFileAtURL(NSURL *rootURL, NSURL *fileURL, NSUInteger le
 	
 }
 static inline void _XULogUbiquityFolderContentsStartingAtURL(NSURL *rootURL) {
+	if (rootURL == nil){
+		printf("====================================================\n");
+		printf("| Ubiquity folder == nil -> iCloud is not enabled. |\n");
+		printf("====================================================\n");
+		return;
+	}
+	
 	printf("====== Printing Ubiquity Contents ======\n");
 	_XULogFileAtURL(rootURL, rootURL, 0);
 }

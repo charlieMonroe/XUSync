@@ -39,7 +39,7 @@
 @property (readonly, nonnull, nonatomic) NSArray *availableDocumentUUIDs;
 
 /** Delegate of the app sync manager. */
-@property (readonly, weak, nonnull, nonatomic) id<XUApplicationSyncManagerDelegate> delegate;
+@property (readonly, weak, nullable, nonatomic) id<XUApplicationSyncManagerDelegate> delegate;
 
 /** Name of the app, usually. Whatever passed in -initWithName:. */
 @property (readonly, strong, nonnull, nonatomic) NSString *name;
