@@ -77,7 +77,11 @@ static NSMutableDictionary *_relationshipValueChanges;
 }
 
 -(void)_applyAttributeSyncChange:(XUAttributeSyncChange *)syncChange{
-	[self setValue:[syncChange attributeValue] forKey:[syncChange attributeName]];
+	id value = [syncChange attributeValue];
+	if ([value isKindOfClass:[NSNull class]]) {
+		value = nil;
+	}
+	[self setValue:value forKey:[syncChange attributeName]];
 	
 	[_changesLock lock];
 	
@@ -87,7 +91,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 		_attributeValueChanges[[self syncUUID]] = changes;
 	}
 	
-	id value = [syncChange attributeValue];
+	// Change it back to null if necessary
 	if (value == nil){
 		value = [NSNull null];
 	}
