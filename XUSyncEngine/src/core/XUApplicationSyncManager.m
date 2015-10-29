@@ -52,6 +52,9 @@ static NSString *const XUApplicationSyncManagerErrorDomain = @"XUApplicationSync
 	/** UUIDs of documents that have been downloaded. */
 	NSArray *_downloadedDocumentUUIDs;
 	
+	/** Use query to detect new files on iCloud and download them. */
+	NSMetadataQuery *_metadataQuery;
+	
 	/** URL of the folder that contains the documents for this sync manager.
 	 * The folder mustn't be created until whole store upload in order to eliminate
 	 * any potential duplicates.
@@ -83,6 +86,18 @@ static NSString *const XUApplicationSyncManagerErrorDomain = @"XUApplicationSync
 		
 		[_availableDocumentUUIDs addObject:documentUUID];
 		[_delegate applicationSyncManager:self didFindNewDocumentWithID:documentUUID];
+	}
+}
+-(void)_metadataQueryGotUpdated:(NSNotification *)aNotif {
+	for (NSMetadataItem *item in [_metadataQuery results]){
+		NSURL *URL = [item valueForAttribute:NSMetadataItemURLKey];
+		if (URL == nil){
+			continue;
+		}
+		NSError *error;
+		if (![[NSFileManager defaultManager] startDownloadingUbiquitousItemAtURL:URL error:&error]){
+			NSLog(@"%s - failed to start downloading ubiquitous item at URL %@ because %@", __PRETTY_FUNCTION__, URL, error);
+		}
 	}
 }
 -(void)_startDownloadingUbiquitousItemAtURL:(NSURL *)url{
@@ -139,6 +154,11 @@ static NSString *const XUApplicationSyncManagerErrorDomain = @"XUApplicationSync
 		[self _checkForNewDocuments];
 		
 		[self logUbiquityFolderContents];
+		
+		_metadataQuery = [[NSMetadataQuery alloc] init];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_metadataQueryGotUpdated:) name:NSMetadataQueryDidUpdateNotification object:_metadataQuery];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_metadataQueryGotUpdated:) name:NSMetadataQueryDidFinishGatheringNotification object:_metadataQuery];
+		[_metadataQuery startQuery];
 	}
 	return self;
 }

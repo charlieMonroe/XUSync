@@ -562,8 +562,10 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		
 		NSError *err;
 		NSURL *deviceSpecificFolderURL = [XUDocumentSyncManager _deviceSpecificUbiquityFolderURLForSyncManager:_applicationSyncManager computerID:XU_DEVICE_ID() andDocumentUUID:_UUID];
-		if (![[NSFileManager defaultManager] createDirectoryAtURL:deviceSpecificFolderURL withIntermediateDirectories:YES attributes:nil error:&err]) {
-			NSLog(@"%@ - failed to create device specific ubiquity folder URL %@, error %@", self, deviceSpecificFolderURL, err);
+		if (deviceSpecificFolderURL != nil){
+			if (![[NSFileManager defaultManager] createDirectoryAtURL:deviceSpecificFolderURL withIntermediateDirectories:YES attributes:nil error:&err]) {
+				NSLog(@"%@ - failed to create device specific ubiquity folder URL %@, error %@", self, deviceSpecificFolderURL, err);
+			}
 		}
 		
 		/** We're running all syncing on the main thread. */
@@ -572,8 +574,10 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		_syncStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:_syncModel];
 		
 		NSURL *persistentStoreURL = [XUDocumentSyncManager _persistentSyncStorageURLForSyncManager:_applicationSyncManager computerID:XU_DEVICE_ID() andDocumentUUID:_UUID];
-		if (![[NSFileManager defaultManager] createDirectoryAtURL:[persistentStoreURL URLByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&err]){
-			NSLog(@"%@ - failed to create persistent store folder URL %@, error %@", self, [persistentStoreURL URLByDeletingLastPathComponent], err);
+		if (persistentStoreURL != nil){
+			if (![[NSFileManager defaultManager] createDirectoryAtURL:[persistentStoreURL URLByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&err]){
+				NSLog(@"%@ - failed to create persistent store folder URL %@, error %@", self, [persistentStoreURL URLByDeletingLastPathComponent], err);
+			}
 		}
 		
 		NSDictionary *dict = @{
