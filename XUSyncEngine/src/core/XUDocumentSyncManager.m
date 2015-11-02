@@ -10,6 +10,10 @@
 
 @import ObjectiveC;
 
+#if TARGET_OS_IPHONE
+	@import UIKit;
+#endif
+
 #import "XUApplicationSyncManager.h"
 #import "XUManagedObject.h"
 
@@ -43,6 +47,11 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	
 	/** Persistent store coordinator used in -syncManagedObjectContext. */
 	NSPersistentStoreCoordinator *_syncStoreCoordinator;
+	
+	#if TARGET_OS_IPHONE
+		/** Background task while syncing. */
+		UIBackgroundTaskIdentifier _syncBackgroundTaskIdentifier;
+	#endif
 	
 	struct {
 		BOOL _isSyncing : 1;
@@ -551,7 +560,7 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	return YES;
 }
 
--(nonnull instancetype)initWithManagedObjectContext:(nonnull NSManagedObjectContext *)managedObjectContext applicationSyncManager:(nonnull XUApplicationSyncManager *)appSyncManager andUUID:(nonnull NSString *)UUID{
+-(nullable instancetype)initWithManagedObjectContext:(nonnull NSManagedObjectContext *)managedObjectContext applicationSyncManager:(nonnull XUApplicationSyncManager *)appSyncManager andUUID:(nonnull NSString *)UUID{
 	if ((self = [super init]) != nil) {
 		_managedObjectContext = managedObjectContext;
 		[_managedObjectContext setDocumentSyncManager:self];
@@ -574,10 +583,12 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		_syncStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:_syncModel];
 		
 		NSURL *persistentStoreURL = [XUDocumentSyncManager _persistentSyncStorageURLForSyncManager:_applicationSyncManager computerID:XU_DEVICE_ID() andDocumentUUID:_UUID];
-		if (persistentStoreURL != nil){
-			if (![[NSFileManager defaultManager] createDirectoryAtURL:[persistentStoreURL URLByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&err]){
-				NSLog(@"%@ - failed to create persistent store folder URL %@, error %@", self, [persistentStoreURL URLByDeletingLastPathComponent], err);
-			}
+		if (persistentStoreURL == nil){
+			return nil;
+		}
+		
+		if (![[NSFileManager defaultManager] createDirectoryAtURL:[persistentStoreURL URLByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&err]){
+			NSLog(@"%@ - failed to create persistent store folder URL %@, error %@", self, [persistentStoreURL URLByDeletingLastPathComponent], err);
 		}
 		
 		NSDictionary *dict = @{
@@ -609,11 +620,31 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	_flags._isSyncing = YES;
 	[_synchronizationLock unlock];
 	
+	#if TARGET_OS_IPHONE
+		_syncBackgroundTaskIdentifier = [[UIApplication sharedApplication] beginBackgroundTaskWithName:@"XUDocumentSyncManager.Sync" expirationHandler:^{
+			if (_syncBackgroundTaskIdentifier != UIBackgroundTaskInvalid) {
+				// The sync hasn't finished yet. Inform the user.
+				_syncBackgroundTaskIdentifier = UIBackgroundTaskInvalid;
+				
+				UILocalNotification *notification = [[UILocalNotification alloc] init];
+				[notification setAlertTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ couldn't finish synchronization in the background.", @""), [[NSProcessInfo processInfo] processName]]];
+				[notification setAlertBody:[NSString stringWithFormat:NSLocalizedString(@"Please switch back to %@ so that the synchronization can finish.", @""), [[NSProcessInfo processInfo] processName]]];
+				[notification setFireDate:[[NSDate date] dateByAddingTimeInterval:1.0]];
+				[[UIApplication sharedApplication] scheduleLocalNotification:notification];
+			}
+		}];
+	#endif
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		NSError *err;
 		BOOL result = [self _synchronizeAndReturnError:&err];
 		
 		dispatch_sync(dispatch_get_main_queue(), ^{
+			#if TARGET_OS_IPHONE
+				[[UIApplication sharedApplication] endBackgroundTask:_syncBackgroundTaskIdentifier];
+				_syncBackgroundTaskIdentifier = UIBackgroundTaskInvalid;
+			#endif
+			
 			completionHandler(result, err);
 		});
 	});

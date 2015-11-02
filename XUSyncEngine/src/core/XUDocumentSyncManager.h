@@ -58,8 +58,10 @@
 +(nullable NSURL *)URLOfNewestEntireDocumentWithUUID:(nonnull NSString *)UUID forApplicationSyncManager:(nonnull XUApplicationSyncManager *)appSyncManager andReturnComputerID:(NSString * __nullable * __nullable)computerIDPtr;
 
 
-/** Inits the document sync manager with fileURL, appSyncManager and UUID. */
--(nonnull instancetype)initWithManagedObjectContext:(nonnull NSManagedObjectContext *)managedObjectContext applicationSyncManager:(nonnull XUApplicationSyncManager *)appSyncManager andUUID:(nonnull NSString *)UUID;
+/** Inits the document sync manager with fileURL, appSyncManager and UUID. Returns 
+ * nil, if iCloud is off.
+ */
+-(nullable instancetype)initWithManagedObjectContext:(nonnull NSManagedObjectContext *)managedObjectContext applicationSyncManager:(nonnull XUApplicationSyncManager *)appSyncManager andUUID:(nonnull NSString *)UUID;
 
 /** Starts synchronization with other devices. */
 -(void)startSynchronizingWithCompletionHandler:(nonnull void(^)(BOOL success, NSError * __nullable error))completionHandler;
