@@ -635,9 +635,10 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		}];
 	#endif
 	
+	__weak XUDocumentSyncManager *weakSelf = self;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		NSError *err;
-		BOOL result = [self _synchronizeAndReturnError:&err];
+		BOOL result = [weakSelf _synchronizeAndReturnError:&err];
 		
 		dispatch_sync(dispatch_get_main_queue(), ^{
 			#if TARGET_OS_IPHONE
