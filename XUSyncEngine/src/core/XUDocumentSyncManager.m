@@ -456,7 +456,7 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
  *
  */
 -(BOOL)_synchronizeAndReturnError:(NSError **)err{
-	__autoreleasing NSError *___err;
+	__autoreleasing NSError *___err = nil;
 	if (err == NULL){
 		err = &___err;
 	}
@@ -534,16 +534,19 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		return YES;
 	}
 	
+	__block NSError *blockError = nil;
 	__block BOOL syncApplicationFailed = NO;
 	dispatch_sync(dispatch_get_main_queue(), ^{
 		for (XUSyncChangeSet *changeSet in changeSets){
-			if (![self _applyChangeSet:changeSet withObjectCache:objCache andReturnError:error]){
+			if (![self _applyChangeSet:changeSet withObjectCache:objCache andReturnError:&blockError]){
 				// This is a igger issue
 				syncApplicationFailed = YES;
 				break;
 			}
 		}
 	});
+	
+	*error = blockError;
 	
 	if (syncApplicationFailed){
 		return NO;
@@ -637,7 +640,7 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	
 	__weak XUDocumentSyncManager *weakSelf = self;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		NSError *err;
+		NSError *err = nil;
 		BOOL result = [weakSelf _synchronizeAndReturnError:&err];
 		
 		dispatch_sync(dispatch_get_main_queue(), ^{
