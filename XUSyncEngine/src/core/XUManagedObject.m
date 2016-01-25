@@ -57,6 +57,7 @@ static NSMutableDictionary *_relationshipValueChanges;
 @implementation XUManagedObject
 
 @dynamic ticdsSyncID;
+@synthesize isApplyingSyncChange = _isApplyingSyncChange;
 
 +(void)initialize{
 	static dispatch_once_t onceToken;
@@ -485,28 +486,36 @@ static NSMutableDictionary *_relationshipValueChanges;
 }
 
 -(void)applySyncChange:(nonnull XUSyncChange *)syncChange{
+	BOOL previousValue = _isApplyingSyncChange;
+	[self setIsApplyingSyncChange:YES];
+	
 	if ([syncChange isKindOfClass:[XUAttributeSyncChange class]]) {
 		[self _applyAttributeSyncChange:(XUAttributeSyncChange *)syncChange];
+		[self setIsApplyingSyncChange:previousValue];
 		return;
 	}
 	
 	if ([syncChange isKindOfClass:[XUDeletionSyncChange class]]) {
 		[self _applyDeletionSyncChange:(XUDeletionSyncChange *)syncChange];
+		[self setIsApplyingSyncChange:previousValue];
 		return;
 	}
 	
 	if ([syncChange isKindOfClass:[XUToManyRelationshipAdditionSyncChange class]]) {
 		[self _applyToManyRelationshipAdditionSyncChange:(XUToManyRelationshipAdditionSyncChange *)syncChange];
+		[self setIsApplyingSyncChange:previousValue];
 		return;
 	}
 	
 	if ([syncChange isKindOfClass:[XUToManyRelationshipDeletionSyncChange class]]) {
 		[self _applyToManyRelationshipDeletionSyncChange:(XUToManyRelationshipDeletionSyncChange *)syncChange];
+		[self setIsApplyingSyncChange:previousValue];
 		return;
 	}
 	
 	if ([syncChange isKindOfClass:[XUToOneRelationshipSyncChange class]]) {
 		[self _applyToOneRelationshipSyncChange:(XUToOneRelationshipSyncChange *)syncChange];
+		[self setIsApplyingSyncChange:previousValue];
 		return;
 	}
 	

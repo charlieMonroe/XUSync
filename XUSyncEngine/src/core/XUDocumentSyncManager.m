@@ -38,6 +38,7 @@ static NSString *const XUDocumentNameKey = @"XUDocumentName";
 
 static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastProcessedChangeSet";
 
+
 @implementation XUDocumentSyncManager {
 	/** Lock used for ensuring that only one synchronization is done at once. */
 	NSLock *_synchronizationLock;

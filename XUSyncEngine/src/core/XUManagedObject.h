@@ -62,6 +62,12 @@
 
 
 
+/** Marked as YES if the engine is currently applying a sync change. If you are
+ * observing some changes made to the object, and creating further changes based
+ * on that observation, you can opt-out based on this property.
+ */
+@property (readwrite, nonatomic) BOOL isApplyingSyncChange;
+
 /** This is an important property that returns YES if the object is being created
  * by the sync engine - i.e. the entity was inserted into the context.
  *
