@@ -175,7 +175,7 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 			return;
 		}
 		
-		[[NSFileManager defaultManager] createDirectoryAtURL:fileURL withIntermediateDirectories:YES attributes:nil error:&fmErr];
+		[[NSFileManager defaultManager] createDirectoryAtURL:fileURL withIntermediateDirectories:YES attributes:nil error:NULL];
 		
 		NSURL *remoteDocumentURL = [accountURL URLByAppendingPathComponent:documentName];
 		NSURL *localDocumentURL = [fileURL URLByAppendingPathComponent:documentName];
