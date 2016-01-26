@@ -175,6 +175,8 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 			return;
 		}
 		
+		[[NSFileManager defaultManager] createDirectoryAtURL:fileURL withIntermediateDirectories:YES attributes:nil error:&fmErr];
+		
 		NSURL *remoteDocumentURL = [accountURL URLByAppendingPathComponent:documentName];
 		NSURL *localDocumentURL = [fileURL URLByAppendingPathComponent:documentName];
 		if ([[NSFileManager defaultManager] copyItemAtURL:remoteDocumentURL toURL:localDocumentURL error:error]) {
@@ -684,9 +686,10 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	// Copy the document somewhere else, since the upload may take some time and
 	// changes may be made
 	NSURL *tempFolderURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
-	[[NSFileManager defaultManager] createDirectoryAtURL:tempFolderURL withIntermediateDirectories:YES attributes:nil error:NULL];
+	NSError *fmErr = nil;
 	
-	NSError *fmErr;
+	[[NSFileManager defaultManager] createDirectoryAtURL:tempFolderURL withIntermediateDirectories:YES attributes:nil error:&fmErr];
+	
 	if (![[NSFileManager defaultManager] copyItemAtURL:fileURL toURL:[tempFolderURL URLByAppendingPathComponent:[fileURL lastPathComponent]] error:&fmErr]){
 		completionHandler(NO, fmErr);
 		_flags._isUploadingEntireDocument = NO;
@@ -707,6 +710,8 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 			
 			// Delete the old whole-store
 			[[NSFileManager defaultManager] removeItemAtURL:targetURL error:NULL];
+			
+			[[NSFileManager defaultManager] createDirectoryAtURL:tempFolderURL withIntermediateDirectories:YES attributes:nil error:NULL];
 			
 			if (![[NSFileManager defaultManager] copyItemAtURL:[tempFolderURL URLByAppendingPathComponent:[fileURL lastPathComponent]] toURL:targetURL error:&err]){
 				success = NO;
