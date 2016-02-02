@@ -282,8 +282,14 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		obj = [(XUManagedObject *)[cl alloc] initWithEntity:entityDescription insertIntoManagedObjectContext:_managedObjectContext asResultOfSyncAction:YES];
 		NSDictionary *attributes = [change attributes];
 		for (NSString *key in attributes){
-			id value = attributes[key];
-			[obj setValue:value forKey:key];
+			[obj setIsApplyingSyncChange:YES];
+			
+			@try {
+				id value = attributes[key];
+				[obj setValue:value forKey:key];
+			} @finally {
+				[obj setIsApplyingSyncChange:NO];
+			}
 		}
 		
 		// TODO - should this be really an assertion?
