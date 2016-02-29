@@ -652,6 +652,10 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 		NSError *err = nil;
 		BOOL result = [weakSelf _synchronizeAndReturnError:&err];
 		
+		[_synchronizationLock lock];
+		_flags._isSyncing = NO;
+		[_synchronizationLock unlock];
+		
 		dispatch_sync(dispatch_get_main_queue(), ^{
 			#if TARGET_OS_IPHONE
 				[[UIApplication sharedApplication] endBackgroundTask:_syncBackgroundTaskIdentifier];
@@ -661,8 +665,6 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 			completionHandler(result, err);
 		});
 	});
-	
-	_flags._isSyncing = NO;
 }
 -(void)uploadEntireDocumentFromURL:(nonnull NSURL *)fileURL withCompletionHandler:(nonnull void (^)(BOOL, NSError * __nullable))completionHandler{
 	// The _flags._isUploadingEntireDocument flag is only changed from main thread
