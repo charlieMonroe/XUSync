@@ -418,7 +418,7 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	
 	latestTimeStamp = MIN(latestTimeStamp, [NSDate timeIntervalSinceReferenceDate] - (24.0 * 3600.0));
 	
-	// NewerThan: 0.0 -> All of them
+	// Get all change sets.
 	NSArray *syncChangeSets = [XUSyncChangeSet allChangeSetsInManagedObjectContext:_syncManagedObjectContext withTimestampNewerThan:0.0];
 	for (XUSyncChangeSet *changeSet in syncChangeSets){
 		if ([changeSet timestamp] < latestTimeStamp){
@@ -507,6 +507,8 @@ static NSString *const XUDocumentLastProcessedChangeSetKey = @"XUDocumentLastPro
 	NSManagedObjectContext *ctx = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:_syncModel];
 	NSURL *fileURL = [XUDocumentSyncManager _persistentSyncStorageURLForSyncManager:_applicationSyncManager computerID:computerID andDocumentUUID:_UUID];
+	
+	[[NSFileManager defaultManager] startDownloadingUbiquitousItemAtURL:fileURL error:NULL];
 	
 	NSError *err;
 	NSDictionary *options = @{
