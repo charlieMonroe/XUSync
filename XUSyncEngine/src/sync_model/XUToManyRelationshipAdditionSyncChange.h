@@ -11,6 +11,7 @@
 /** This class represents a change where an object was added into a -to-many
  * relationship set.
  */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUToManyRelationshipAdditionSyncChange : XURelationshipSyncChange
 
 

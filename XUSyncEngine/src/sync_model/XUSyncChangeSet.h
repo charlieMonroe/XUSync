@@ -12,6 +12,7 @@
  * This allows XUSyncEngine to go just through a few change sets, instead of 
  * potentially hundreds or even thousands of actual changes.
  */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUSyncChangeSet : NSManagedObject
 
 /** Fetches all change sets in the supplied MOC. */

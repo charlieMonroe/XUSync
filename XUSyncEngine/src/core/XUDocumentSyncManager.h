@@ -11,6 +11,7 @@
 
 @class XUApplicationSyncManager, XUDocumentSyncManager;
 
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @protocol XUDocumentSyncManagerDelegate <NSObject>
 
 /** This method is called when the sync manager fails to save information
@@ -34,7 +35,7 @@
 
 @end
 
-
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUDocumentSyncManager : NSObject
 
 /** Synchronously downloads document with document ID to URL and returns error,
@@ -102,6 +103,7 @@
 @interface NSManagedObjectContext (XUSync)
 
 /** Sync manager. */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @property (readwrite, weak, nullable, nonatomic) XUDocumentSyncManager *documentSyncManager;
 
 @end

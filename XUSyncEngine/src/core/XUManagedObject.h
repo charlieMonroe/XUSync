@@ -17,6 +17,7 @@
  * since this framework is designed to be compatible with existing stores that
  * use TICDS.
  */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUManagedObject : NSManagedObject
 
 /** Call this when processing an insertion change - this will let the managed

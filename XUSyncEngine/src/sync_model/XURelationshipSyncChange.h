@@ -9,6 +9,7 @@
 #import "XUSyncChange.h"
 
 /** This is an abstract class representing relationship sync changes. */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XURelationshipSyncChange : XUSyncChange
 
 /** Designated initializer. */

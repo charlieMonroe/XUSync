@@ -9,6 +9,7 @@
 #import "XUSyncChange.h"
 
 /** This class represents a change of attribute's value. */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUAttributeSyncChange : XUSyncChange
 
 /** Designated initializer. */

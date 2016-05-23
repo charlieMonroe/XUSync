@@ -11,6 +11,7 @@
 /** This class represents a sync change where an object has been inserted
  * into the MOC.
  */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore")
 @interface XUInsertionSyncChange : XUSyncChange
 
 /** A list of all attributes. Created by -initWithObject:. Relationships are

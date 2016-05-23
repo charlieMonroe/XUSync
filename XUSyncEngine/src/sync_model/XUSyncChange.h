@@ -17,6 +17,7 @@
  * XUManagedObject to be an actual entity, but this kind of went downhill due
  * to maintaining backward compatibility with TICDS...
  */
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUSyncChange : NSManagedObject
 
 /** Creates a new sync change */

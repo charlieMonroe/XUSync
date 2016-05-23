@@ -10,6 +10,7 @@
 
 @class XUApplicationSyncManager;
 
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @protocol XUApplicationSyncManagerDelegate <NSObject>
 
 /** Called when the manager found a new document. It might not be downloaded yet. */
@@ -17,7 +18,7 @@
 
 @end
 
-
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUApplicationSyncManager : NSObject
 
 /** Downloads or copies document with ID to URL and calls completion handler

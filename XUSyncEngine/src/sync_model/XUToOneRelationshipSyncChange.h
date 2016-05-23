@@ -8,6 +8,7 @@
 
 #import "XURelationshipSyncChange.h"
 
+DEPRECATED_MSG_ATTRIBUTE("Use XUCore.")
 @interface XUToOneRelationshipSyncChange : XURelationshipSyncChange
 
 @end

@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "7A0E5F68F162E96F9915619C54751BA65DBF45ED",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "7A0E5F68F162E96F9915619C54751BA65DBF45ED" : 0,
+    "A395A3FD702B1E758B8EC53DFA100D6CB2329A67" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "7FC12256-0DE0-4134-B67D-6C3B76E7495D",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "7A0E5F68F162E96F9915619C54751BA65DBF45ED" : "XUSyncEngine\/",
+    "A395A3FD702B1E758B8EC53DFA100D6CB2329A67" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "XUSyncEngine",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "XUSyncEngine.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/charlieMonroe\/XUSync",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7A0E5F68F162E96F9915619C54751BA65DBF45ED"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/charlieMonroe\/uctox-2.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A395A3FD702B1E758B8EC53DFA100D6CB2329A67"
+    }
+  ]
+}
